@@ -4,11 +4,6 @@
 
     <!-- Declaring custom permissions -->
     <permission
-        android:name="org.pepzer.mqttdroid.BIND_PROXY"
-        android:description="@string/permission_bind_proxy"
-        android:label="@string/permission_bind_proxy"
-        android:protectionLevel="dangerous" />
-    <permission
         android:name="org.pepzer.mqttdroid.BIND_AUTH"
         android:description="@string/permission_bind_auth"
         android:label="@string/permission_bind_auth"
@@ -63,7 +58,6 @@
             android:name=".ProxyService"
             android:enabled="true"
             android:exported="true"
-            android:permission="org.pepzer.mqttdroid.BIND_PROXY"
             android:process=":remote_proxy" />
 
         <!-- Declaring broadcast receiver for BOOT_COMPLETED event. -->

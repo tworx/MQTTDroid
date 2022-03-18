@@ -784,17 +784,23 @@ public class ProxyService extends Service {
          *   the result is sent through the method `subscribeCallback` of the client's callback.
          */
         public boolean subscribe(String topic, int qos) {
-
             String packageName = Utils.getCallerPackage(pm);
+            /*
             if (packageToAuthState.containsKey(packageName)) {
                 int authState = packageToAuthState.get(packageName);
                 if (authState == Utils.APP_ALLOWED) {
+
+             */
                     SubscribeMsg msg = new SubscribeMsg(packageName, topic, qos);
+                    Log.i(TAG,"Setting up subscribe to: " + topic + " for: " + packageName);
                     mHandler.sendMessage(mHandler.obtainMessage(MSG_SUBSCRIBE, msg));
                     return true;
+                    /*
                 }
             }
             return false;
+
+                     */
         }
 
         /**
@@ -873,20 +879,24 @@ public class ProxyService extends Service {
                 return false;
             }
             String packageName = Utils.getCallerPackage(pm);
-
+/*
             if (packageToAuthState.containsKey(packageName)) {
                 int authState = packageToAuthState.get(packageName);
                 Log.v(TAG, "registerNetCallback pkg: " + packageName + ", auth: " + authState);
 
                 if (authState == Utils.APP_ALLOWED) {
-                    packageToCallback.put(packageName, callback);
 
+ */
+                    packageToCallback.put(packageName, callback);
+/*
                     if (packageName.equals(rcvPackage)) {
                         doUnbindReceiver();
                     }
                     return true;
                 }
             }
+
+ */
             return false;
         }
 
@@ -1016,11 +1026,13 @@ public class ProxyService extends Service {
                     Log.v(TAG, "Subscribe received");
                     SubscribeMsg smsg = (SubscribeMsg) msg.obj;
                     if (handleSubscribe(smsg) && proxyState == Utils.PROXY_CONNECTED) {
+                        Log.v(TAG, "Trying subscribe");
                         try {
                             IMqttToken token;
                             token = mqttClient.subscribe(smsg.getTopic(), smsg.getQos());
                             token.waitForCompletion(mqttConfig.getComplTimeout());
                             success = true;
+                            Log.v(TAG, "Subscribe success");
                         } catch (MqttException e) {
                             e.printStackTrace();
                         }
@@ -1392,8 +1404,11 @@ public class ProxyService extends Service {
         AppAuthSub authSub = authDataSource.getAuthSub(packageName, topic);
         if (authSub == null) {
             Log.w(TAG, "handleSubscribe, authSub is null! Package: " + packageName);
+            /*
             Pattern subPat = packageToSubPattern.get(packageName);
             if (subPat != null && subPat.matcher(topic).matches()) {
+
+             */
                 authSub = new AppAuthSub();
                 authSub.setTopic(topic);
                 authSub.setQos(qos);
@@ -1402,12 +1417,17 @@ public class ProxyService extends Service {
 
                 long id = authDataSource.createAuthSub(packageName, topic, qos, false);
                 authSub.setId(id);
+                /*
             } else {
                 return false;
             }
+
+                 */
         }
 
+        /*
         if (authSub.isActive()) {
+            Log.i(TAG,"sub is active");
             if (authSub.getQos() == qos) {
                 return false;
             } else {
@@ -1420,12 +1440,24 @@ public class ProxyService extends Service {
                 }
             }
         }
+
+         */
         authSub.setQos(qos);
         authSub.setActive(true);
         authDataSource.updateAuthSub(authSub);
 
         clearPackageMaps();
         populatePackageMaps();
+        List<AppAuthSub> subList = new ArrayList<>();
+        subList.add(authSub);
+        Pattern subPat = buildSubsPattern(subList);
+        if (subPat != null) {
+            packageToSubPattern.put(packageName, subPat);
+        }
+        Pattern activeSubPat = buildSubsPattern(subList);
+        if (activeSubPat != null) {
+            subPatternToPackage.put(activeSubPat, packageName);
+        }
 
         return true;
     }
