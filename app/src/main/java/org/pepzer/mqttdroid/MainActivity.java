@@ -603,7 +603,8 @@ public class MainActivity extends AppCompatActivity {
          * @param proxyState
          */
         public void proxyStateChanged(int proxyState) {
-            mHandler.sendMessage(mHandler.obtainMessage(MSG_PROXY_STATE_CHANGE, proxyState));
+            mHandler.sendMessage(mHandler.obtainMessage(MSG_PROXY_STATE_CHANGE,
+                    Utils.proxyStateIntToEnum(proxyState)));
         }
     };
 
@@ -631,7 +632,7 @@ public class MainActivity extends AppCompatActivity {
                  * Handle the proxy state change event by updating the UI.
                  */
                 case MSG_PROXY_STATE_CHANGE:
-                    proxyState = Utils.proxyStateIntToEnum ((int) msg.obj);
+                    proxyState = (ProxyState)msg.obj;
                     updateStatusUI(proxyState, true);
                     break;
 
