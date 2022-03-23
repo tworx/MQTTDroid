@@ -5,6 +5,7 @@ pipeline {
         nexusCredentials = credentials('nexus-build-agent-credentials')
         nexusRepoPath = "/nexus/repository/maven-"
         mavenRepoType = "${env.TAG_NAME == null ? 'snapshots' : 'releases'}"
+        snapshotTag = "${env.TAG_NAME == null ? 'SNAPSHOT' : ''}"
         debugKeyStore = credentials('android-debug-keystore')
         debugKeyStorePwd = credentials('android-debug-keystore-pwd')
         debugKeyStoreAlias = credentials('android-debug-keystore-alias')
@@ -17,7 +18,7 @@ pipeline {
                 script {                    
                     docker.withRegistry("${TWORX_DOCKER_REPO}", "${registryCredentials}") {
                         docker.image("${androidSDKImageName}").inside {
-                            sh "./gradlew :mqttservice:bundleDebugAar :mqttservice:bundleReleaseAar"
+                            sh "./gradlew -PsnapshotTag=${snapshotTag} :mqttservice:bundleDebugAar :mqttservice:bundleReleaseAar"
                         }
                     }
                 }
@@ -34,7 +35,7 @@ pipeline {
                                 def ipAddr = readFile(file: 'repo-ip.txt').replaceAll("[\n]","")
                                 def fileData = "tworxrepo=http://" + ipAddr + nexusRepoPath + mavenRepoType + "\ntworxrepoUser=" + nexusUser + "\ntworxrepoPwd=" + nexusPwd + "\n"
                                 writeFile(file: 'local.properties', text: fileData)
-                                sh "./gradlew :mqttservice:publishReleasePublicationToTworxrepoRepository"
+                                sh "./gradlew -PsnapshotTag=${snapshotTag} :mqttservice:publishReleasePublicationToTworxrepoRepository"
                             }
                         }
                     }
