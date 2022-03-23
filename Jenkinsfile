@@ -5,7 +5,7 @@ pipeline {
         nexusCredentials = credentials('nexus-build-agent-credentials')
         nexusRepoPath = "/nexus/repository/maven-"
         mavenRepoType = "${env.TAG_NAME == null ? 'snapshots' : 'releases'}"
-        snapshotTag = "${env.TAG_NAME == null ? 'SNAPSHOT' : ''}"
+        snapshotTag = "${env.TAG_NAME == null ? '-SNAPSHOT' : ''}"
         debugKeyStore = credentials('android-debug-keystore')
         debugKeyStorePwd = credentials('android-debug-keystore-pwd')
         debugKeyStoreAlias = credentials('android-debug-keystore-alias')
