@@ -800,6 +800,18 @@ public class ProxyService extends Service {
         }
 
         /**
+         * Try to do a connection attempt now if not connected.
+         * @throws RemoteException
+         */
+        @Override
+        public void tryConnect() throws RemoteException {
+            Log.i(TAG, "tryConnect()");
+            if (proxyState == ProxyState.PROXY_DISCONNECTED) {
+                doConnect();
+            }
+        }
+
+        /**
          * Expose the mqtt subscribe command to the clients.
          * Topics must match one of those requested by the app, and the app must be allowed by the user.
          * @param topic
